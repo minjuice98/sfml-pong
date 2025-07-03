@@ -12,6 +12,11 @@ void Scene::Init()
 	{
 		obj->Init();
 	}
+
+	for (auto obj : objectsToAdd)
+	{
+		obj->Init();
+	}
 }
 
 void Scene::Release()
@@ -34,6 +39,11 @@ void Scene::Enter()
 	{
 		obj->Reset();
 	}
+
+	for (auto obj : objectsToAdd)
+	{
+		obj->Reset();
+	}
 }
 
 void Scene::Exit()
@@ -47,31 +57,66 @@ void Scene::Update(float dt)
 {
 	for (auto obj : gameObjects)
 	{
-		obj->Update(dt);
+		if (obj->GetActive())
+		{
+			obj->Update(dt);
+		}
 	}
 }
 
+
+
 void Scene::Draw(sf::RenderWindow& window)
 {
-	for (auto obj : gameObjects)
+	std::list<GameObject*> sortedObjects(gameObjects);
+
+	sortedObjects.sort(DrawOrderComparer());
+
+	//sortedObjects.sort(
+	//	[](const GameObject* a, const GameObject* b)
+	//	{
+	//		if (a->sortingLayer != b->sortingLayer)
+	//		{
+	//			return a->sortingLayer < b->sortingLayer;
+	//		}
+	//		return a->sortingOrder < b->sortingOrder;
+	//	}
+	//);
+
+	for (auto obj : sortedObjects)
 	{
-		obj->Draw(window);
+		if (obj->GetActive())
+		{
+			obj->Draw(window);
+		}
 	}
+
+	for (GameObject* go : objectsToAdd)
+	{
+		if (std::find(gameObjects.begin(), gameObjects.end(), go) == gameObjects.end())
+		{
+			gameObjects.push_back(go);
+		}
+	}
+	objectsToAdd.clear();
+
+	for (GameObject* go : objectsToRemove)
+	{
+		gameObjects.remove(go);
+	}
+	objectsToRemove.clear();
 }
 
 GameObject* Scene::AddGameObject(GameObject* go)
 {
-	if (std::find(gameObjects.begin(), gameObjects.end(), go) == gameObjects.end())
-	{
-		gameObjects.push_back(go);
-		return go;
-	}
-	return nullptr;
+	objectsToAdd.push_back(go);
+	return go;
 }
 
 void Scene::RemoveGameObject(GameObject* go)
 {
-	gameObjects.remove(go);
+	go->SetActive(false);
+	objectsToRemove.push_back(go);
 }
 
 GameObject* Scene::FindGameObject(const std::string& name)

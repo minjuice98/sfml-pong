@@ -9,9 +9,9 @@ SceneDev2::SceneDev2()
 
 void SceneDev2::Init()
 {
-	fontIds.push_back("fonts/KOMIKAP_.ttf");
+	fontIds.push_back("fonts/DS-DIGIT.ttf");
 
-	TextGo* go = new TextGo("fonts/KOMIKAP_.ttf");
+	TextGo* go = new TextGo("fonts/DS-DIGIT.ttf");
 	go->SetString("Dev 2");
 	go->SetCharacterSize(30);
 	go->SetFillColor(sf::Color::White);
