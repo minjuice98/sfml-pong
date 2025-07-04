@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "InputMgr.h"
 
+std::list<int> InputMgr::downKeys;
+std::list<int> InputMgr::heldKeys;
+std::list<int> InputMgr::upKeys;
 
-std::list<sf::Keyboard::Key> InputMgr::downKeys;
-std::list<sf::Keyboard::Key> InputMgr::heldKeys;
-std::list<sf::Keyboard::Key> InputMgr::upKeys;
+std::unordered_map<Axis, AxisInfo> InputMgr::axisInfoMap;
 
-std::unordered_map<Axis, AxisInfo>InputMgr::axisInfoMap;
+sf::Vector2i InputMgr::mousePosition;
 
 void InputMgr::Init()
 {
@@ -16,8 +17,7 @@ void InputMgr::Init()
 	infoH.positives.push_back(sf::Keyboard::Right);
 	infoH.negatives.push_back(sf::Keyboard::A);
 	infoH.negatives.push_back(sf::Keyboard::Left);
-	
-	axisInfoMap.insert({ Axis::Horizontal, infoH }); 	//sfml 좌표계 위로 올라갈수록 -
+	axisInfoMap.insert({ Axis::Horizontal , infoH });
 
 	AxisInfo infoV;
 	infoV.axis = Axis::Vertical;
@@ -25,18 +25,16 @@ void InputMgr::Init()
 	infoV.positives.push_back(sf::Keyboard::Down);
 	infoV.negatives.push_back(sf::Keyboard::W);
 	infoV.negatives.push_back(sf::Keyboard::Up);
-
-	axisInfoMap.insert({ Axis::Vertical, infoV });	//sfml 좌표계 위로 올라갈수록 -
+	axisInfoMap.insert({ Axis::Vertical , infoV });
 }
-//나중에 입력 들어온 것을 우선으로 처리
 
-void InputMgr::Clear() 
+void InputMgr::Clear()
 {
 	downKeys.clear();
 	upKeys.clear();
 }
 
-void InputMgr::UpdateEvent(const sf::Event& ev) 
+void InputMgr::UpdateEvent(const sf::Event& ev)
 {
 	switch (ev.type)
 	{
@@ -51,11 +49,49 @@ void InputMgr::UpdateEvent(const sf::Event& ev)
 		Remove(heldKeys, ev.key.code);
 		upKeys.push_back(ev.key.code);
 		break;
+	case sf::Event::MouseButtonPressed:
+	{
+		int code = sf::Keyboard::KeyCount + ev.mouseButton.button;
+		if (!Contains(heldKeys, code))
+		{
+			downKeys.push_back(code);
+			heldKeys.push_back(code);
+		}
+	}
+	break;
+	case sf::Event::MouseButtonReleased:
+	{
+		int code = sf::Keyboard::KeyCount + ev.mouseButton.button;
+		Remove(heldKeys, code);
+		upKeys.push_back(code);
+	}
+	break;
 	}
 }
 
-void InputMgr::Update(float dt) 
+void InputMgr::Update(float dt)
 {
+	mousePosition = sf::Mouse::getPosition(FRAMEWORK.GetWindow());
+
+	for (auto& pair : axisInfoMap)
+	{
+		AxisInfo& axisInfo = pair.second;
+		float raw = GetAxisRaw(axisInfo.axis); // -1, 0, 1
+		float dir = raw;
+		if (raw == 0.f && axisInfo.value != 0.f)
+		{
+			dir = axisInfo.value > 0.f ? -1.f : 1.f;
+		}
+		axisInfo.value += dir * axisInfo.sensi * dt;
+		axisInfo.value = Utils::Clamp(axisInfo.value, -1.f, 1.f);
+
+		float stopThreshold = std::abs(dir * axisInfo.sensi * dt);
+		if (raw == 0.f && std::abs(axisInfo.value) < stopThreshold)
+		{
+			axisInfo.value = 0.f;
+		}
+	}
+
 }
 
 bool InputMgr::GetKeyDown(sf::Keyboard::Key key)
@@ -73,12 +109,12 @@ bool InputMgr::GetKey(sf::Keyboard::Key key)
 	return Contains(heldKeys, key);
 }
 
-bool InputMgr::Contains(const std::list<sf::Keyboard::Key>& list, sf::Keyboard::Key key)
+bool InputMgr::Contains(const std::list<int>& list, int key)
 {
 	return std::find(list.begin(), list.end(), key) != list.end();
 }
 
-void InputMgr::Remove(std::list<sf::Keyboard::Key>& list, sf::Keyboard::Key key)
+void InputMgr::Remove(std::list<int>& list, int key)
 {
 	list.remove(key);
 }
@@ -90,11 +126,10 @@ float InputMgr::GetAxisRaw(Axis axis)
 		return 0.f;
 
 	const AxisInfo& axisInfo = findIt->second;
-
-	auto it = heldKeys.rbegin(); //rbegin 역방향 이터레이터
+	auto it = heldKeys.rbegin();
 	while (it != heldKeys.rend())
 	{
-		sf::Keyboard::Key code = *it;
+		int code = *it;
 		if (Contains(axisInfo.positives, code))
 		{
 			return 1.f;
@@ -110,5 +145,31 @@ float InputMgr::GetAxisRaw(Axis axis)
 
 float InputMgr::GetAxis(Axis axis)
 {
-	return 0.0f;
+	auto findIt = axisInfoMap.find(axis);
+	if (findIt == axisInfoMap.end())
+	{
+		return 0.0f;
+	}
+	return findIt->second.value;
 }
+
+bool InputMgr::GetMouseButtonDown(sf::Mouse::Button key)
+{
+	return Contains(downKeys, sf::Keyboard::KeyCount + key);;
+}
+
+bool InputMgr::GetMouseButtonUp(sf::Mouse::Button key)
+{
+	return Contains(upKeys, sf::Keyboard::KeyCount + key);;
+}
+
+bool InputMgr::GetMouseButton(sf::Mouse::Button key)
+{
+	return Contains(heldKeys, sf::Keyboard::KeyCount + key);;
+}
+
+sf::Vector2i InputMgr::GetMousePosition()
+{
+	return mousePosition;
+}
+

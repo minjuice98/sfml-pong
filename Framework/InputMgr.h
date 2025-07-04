@@ -9,22 +9,22 @@ enum class Axis
 struct AxisInfo
 {
 	Axis axis;
-	std::list<sf::Keyboard::Key> positives; //1.f;
-	std::list<sf::Keyboard::Key> negatives;
+	std::list<int> positives; // 1.f;
+	std::list<int> negatives; // -1.f;
 
-	float sensi = 100.f; //크면 빠르게 증가, 느리면 느리게 증가
-	float value = 0.f; //축마다 value라는 값을 들고 있어서 
+	float sensi = 10.f;
+	float value = 0.f;
 };
 
 class InputMgr
 {
 private:
-	//가능한 컨테이너 추가하지 않는 형태로 구현 
-	static std::list<sf::Keyboard::Key> downKeys;
-	static std::list<sf::Keyboard::Key> heldKeys;
-	static std::list<sf::Keyboard::Key> upKeys;
+	static std::list<int> downKeys;
+	static std::list<int> heldKeys;
+	static std::list<int> upKeys;
 
 	static std::unordered_map<Axis, AxisInfo> axisInfoMap;
+	static sf::Vector2i mousePosition;
 
 public:
 	static void Init();
@@ -37,16 +37,16 @@ public:
 	static bool GetKeyUp(sf::Keyboard::Key key);
 	static bool GetKey(sf::Keyboard::Key key);
 
-	static bool Contains(const std::list<sf::Keyboard::Key>& list, sf::Keyboard::Key key);
-	static void Remove(std::list<sf::Keyboard::Key>& list, sf::Keyboard::Key key);
+	static bool Contains(const std::list<int>& list, int key);
+	static void Remove(std::list<int>& list, int key);
 
-	static float GetAxisRaw(Axis axis);
-	static float GetAxis(Axis axis);
+	static float GetAxisRaw(Axis axis); // -1, 0, 1
+	static float GetAxis(Axis axis); // -1 ~ 1
 
-	//함수 추가
-	static bool GetMouseButtonDown(sf::Mouse::Button button);
-	static bool GetMouseButtonUp(sf::Mouse::Button button);
-	static bool GetMouseButton(sf::Mouse::Button button);
+	static bool GetMouseButtonDown(sf::Mouse::Button key);
+	static bool GetMouseButtonUp(sf::Mouse::Button key);
+	static bool GetMouseButton(sf::Mouse::Button key);
 
 	static sf::Vector2i GetMousePosition();
 };
+

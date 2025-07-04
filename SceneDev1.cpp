@@ -32,18 +32,21 @@ void SceneDev1::Update(float dt)
 	{
 		SCENE_MGR.ChangeScene(SceneIds::Dev2);
 	}
+
 	if (InputMgr::GetKeyDown(sf::Keyboard::Num1))
 	{
-		testGo->sortingOrder=-1;
+		testGo->sortingOrder = -1;
 	}
+
 	if (InputMgr::GetKeyDown(sf::Keyboard::Num2))
 	{
 		testGo->sortingOrder = 1;
 	}
 
 	sf::Vector2f dir;
-	dir.x = InputMgr::GetAxisRaw(Axis::Horizontal);
-	dir.x = InputMgr::GetAxisRaw(Axis::Vertical);
+	dir.x = InputMgr::GetAxis(Axis::Horizontal);
+	dir.y = InputMgr::GetAxis(Axis::Vertical);
+
 
 	sf::Vector2f pos = testGo->GetPosition();
 	pos += dir * 100.f * dt;

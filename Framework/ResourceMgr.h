@@ -44,7 +44,7 @@ public:
 			return false;
 		}
 
-		resources.insert({id, res});
+		resources.insert({ id, res });
 		return true;
 	}
 
@@ -77,7 +77,7 @@ public:
 		}
 	}
 
-	T& Get(const std::string& id) 
+	T& Get(const std::string& id)
 	{
 		auto it = resources.find(id);
 		if (it == resources.end())

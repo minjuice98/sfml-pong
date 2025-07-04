@@ -18,7 +18,7 @@ float Utils::RandomValue()
 int Utils::RandomRange(int min, int maxExclude)
 {
     std::uniform_int_distribution<int> dist(min, maxExclude - 1);
-	return dist(gen);
+    return dist(gen);
 }
 
 float Utils::RandomRange(float min, float max)
@@ -49,4 +49,86 @@ sf::Vector2f Utils::SetOrigin(sf::Text& obj, Origins preset)
 sf::Vector2f Utils::SetOrigin(sf::Sprite& obj, Origins preset)
 {
     return SetOrigin(obj, preset, obj.getLocalBounds());
+}
+
+float Utils::Clamp(float value, float min, float max)
+{
+    if (value < min)
+        return min;
+    else if (value > max)
+        return max;
+    return value;
+}
+
+float Utils::Clamp01(float value)
+{
+    return Clamp(value, 0.f, 1.f);
+}
+
+float Utils::Magnitude(const sf::Vector2f& vec)
+{
+    return std::sqrtf(SqrMagnitude(vec));
+}
+
+float Utils::SqrMagnitude(const sf::Vector2f& vec)
+{
+    return vec.x * vec.x + vec.y * vec.y;
+}
+
+sf::Vector2f Utils::GetNormal(const sf::Vector2f& vec)
+{
+    float mag = Utils::Magnitude(vec);
+    if (mag < std::numeric_limits<float>::epsilon())
+    {
+        return { 0.f, 0.f };
+    }
+    return vec / mag;
+}
+
+void Utils::Nomalize(sf::Vector2f& vec)
+{
+    float mag = Utils::Magnitude(vec);
+    if (mag > std::numeric_limits<float>::epsilon())
+    {
+        vec / mag;
+    }
+}
+
+float Utils::Distance(const sf::Vector2f& p1, const sf::Vector2f& p2)
+{
+    sf::Vector2f vec = p1 - p2;
+    return Utils::Magnitude(p1 - p2);
+}
+
+float Utils::Lerp(float min, float max, float t, bool clamp)
+{
+    if (clamp)
+    {
+        t = Utils::Clamp01(t);
+    }
+    return min + (max - min) * t;
+}
+
+sf::Vector2f Utils::Lerp(const sf::Vector2f& min, const sf::Vector2f& max, float t, bool clamp)
+{
+    if (clamp)
+    {
+        t = Utils::Clamp01(t);
+    }
+    return min + (max - min) * t;
+}
+
+sf::Color Utils::Lerp(const sf::Color& min, const sf::Color& max, float t, bool clamp)
+{
+    if (clamp)
+    {
+        t = Utils::Clamp01(t);
+    }
+
+    return sf::Color(
+        (sf::Uint8)Lerp(min.r, max.r, t, clamp),
+        (sf::Uint8)Lerp(min.g, max.g, t, clamp),
+        (sf::Uint8)Lerp(min.b, max.b, t, clamp),
+        (sf::Uint8)Lerp(min.a, max.a, t, clamp)
+    );
 }
