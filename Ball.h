@@ -11,7 +11,8 @@ protected:
 	float speed = 0.f;
 	sf::Vector2f direction;
 
-	Bat* bat = nullptr;
+	Bat* bat1 = nullptr;
+	Bat* bat2 = nullptr;
 
 	float minX = 0.f;
 	float maxX = 0.f;
@@ -35,7 +36,7 @@ public:
 	void Draw(sf::RenderWindow& window) override;
 
 	void Fire(const sf::Vector2f& d, float s);
-	void SetBat(Bat* bat) { this->bat = bat; }
+	void SetBat(Bat* b1, Bat* b2) { bat1 = b1; bat2 = b2; }
 
 };
 

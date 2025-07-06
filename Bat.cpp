@@ -42,9 +42,10 @@ void Bat::SetOrigin(Origins preset)
 
 void Bat::Init()
 {
-	shape.setSize({ 100.f, 5.f });
+	shape.setSize({ 10.f, 100.f });
 	shape.setFillColor(sf::Color::White);
 	SetOrigin(Origins::TC);
+	Reset();
 }
 
 void Bat::Release()
@@ -54,18 +55,16 @@ void Bat::Release()
 void Bat::Reset()
 {
 	sf::FloatRect bounds = FRAMEWORK.GetWindowBounds();
-	SetPosition({ bounds.width * 0.5f, bounds.height - 20.f });
-
 	sf::Vector2f size = shape.getSize();
-	minX = bounds.left + size.x * 0.5f;
-	maxX = (bounds.left + bounds.width) - size.x * 0.5f;
+	minY = 0.f + size.y * 0.5f; 
+	maxY = bounds.height - size.y;
 }
 
 void Bat::Update(float dt)
 {
-	direction.x = InputMgr::GetAxis(Axis::Horizontal);
+	direction.y = InputMgr::GetAxis(control);
 	sf::Vector2f pos = GetPosition() + direction * speed * dt;
-	pos.x = Utils::Clamp(pos.x, minX, maxX);
+	pos.y = Utils::Clamp(pos.y, minY, maxY);
 	SetPosition(pos);
 }
 

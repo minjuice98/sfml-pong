@@ -9,10 +9,12 @@ protected:
 	float speed = 500.f;
 	sf::Vector2f direction;
 
-	float minX = 0.f;
-	float maxX = 0.f;
+	float minY = 0.f;
+	float maxY = 0.f;
 
 public:
+	Axis control = Axis::Vertical1;
+
 	Bat(const std::string& name = "");
 	~Bat() = default;
 
@@ -28,6 +30,7 @@ public:
 	void Update(float dt) override;
 	void Draw(sf::RenderWindow& window) override;
 
+	void SetControl(Axis axis) { control = axis; }
 	sf::FloatRect GetGlobalBounds() { return shape.getGlobalBounds(); }
 };
 
