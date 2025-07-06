@@ -12,10 +12,8 @@ protected:
 
 	sf::Clock clock;
 	float timeScale = 1.f;
-
 	float time = 0.f;
 	float deltaTime = 0.f;
-
 	float realTime = 0.f;
 	float realDeltaTime = 0.f;
 
@@ -36,7 +34,6 @@ public:
 
 	float GetTimeScale() const { return timeScale; }
 	void SetTimeScale(float scale) { timeScale = scale; }
-
 	float GetTime() const { return time; }
 	float GetDeltaTime() const { return deltaTime; }
 	float GetRealTime() const { return realTime; }
