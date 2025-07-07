@@ -9,6 +9,9 @@ SceneGame::SceneGame() :Scene(SceneIds::Game)
 }
 void SceneGame::Init()
 {
+	FONT_MGR.Load("fonts/DS-DIGIT.ttf");
+	font = FONT_MGR.Get("fonts/DS-DIGIT.ttf");
+
 	bat1 = (Bat*)AddGameObject(new Bat("Bat1"));
 	bat2 = (Bat*)AddGameObject(new Bat("Bat2"));
 	ball = (Ball*)AddGameObject(new Ball("Ball"));
@@ -24,7 +27,16 @@ void SceneGame::Init()
 
 	ball->SetBat(bat1, bat2);
 
+	scoreText1.setFont(font);
+	scoreText1.setCharacterSize(60);
+	scoreText1.setFillColor(sf::Color::White);
+	scoreText1.setPosition(200.f, 50.f); 
+	scoreText2.setFont(font);
+	scoreText2.setCharacterSize(60);
+	scoreText2.setFillColor(sf::Color::White);
+	scoreText2.setPosition(FRAMEWORK.GetWindowSize().x - 200.f, 50.f);  
 
+	UpdateScoreText();
 	Scene::Init();
 }
 void SceneGame::Enter()
@@ -56,6 +68,21 @@ void SceneGame::Update(float dt)
 }
 void SceneGame::SetGameOver()
 {
-	//Enter();
+	score1 = 0;
+	score2 = 0;
+	UpdateScoreText();
+
 	SCENE_MGR.ChangeScene(SceneIds::Game);
+}
+
+void SceneGame::UpdateScoreText()
+{
+	scoreText1.setString(std::to_string(score1));
+	scoreText2.setString(std::to_string(score2));
+}
+void SceneGame::Draw(sf::RenderWindow& window)
+{
+	Scene::Draw(window);
+	window.draw(scoreText1);
+	window.draw(scoreText2);
 }

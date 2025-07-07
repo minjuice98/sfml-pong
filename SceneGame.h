@@ -12,8 +12,6 @@ protected:
 	Bat* bat2 = nullptr; //¿À¸¥ÂÊ
 	Ball* ball = nullptr;
 
-	int score1 = 0; 
-	int score2 = 0; 
 
 	sf::Font font;
 	sf::Text scoreText1;
@@ -21,6 +19,9 @@ protected:
 
 	bool ballActive = false;
 public:
+	int score1 = 0;
+	int score2 = 0;
+
 	SceneGame();
 	~SceneGame() override = default;
 
@@ -29,5 +30,5 @@ public:
 	void Update(float dt) override;
 	void SetGameOver();
 	void UpdateScoreText();
+	void Draw(sf::RenderWindow& window);
 };
-
